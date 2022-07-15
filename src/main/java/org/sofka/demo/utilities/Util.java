@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class util {
+public class Util {
     public static <T> List<T> getListFromIterator(Iterator<T> iterator)
     {
 

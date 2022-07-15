@@ -6,7 +6,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.sofka.demo.domain.Cyclist;
+import org.sofka.demo.model.CyclistDto;
 import org.sofka.demo.repository.CyclistRepository;
+import org.sofka.demo.usecase.cyclist.AddCyclistUseCase;
+import org.sofka.demo.usecase.cyclist.GetAllCyclistsUseCase;
+import org.sofka.demo.usecase.cyclist.GetCyclistByCompetitorNumber;
+import org.sofka.demo.usecase.cyclist.GetCyclistsByTeamCodeUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,35 +28,38 @@ import org.springframework.web.bind.annotation.RestController;
 public class CyclistController {
 	@Autowired
 	private CyclistRepository cyclistRepository;
+
+	@Autowired
+	AddCyclistUseCase addCyclistUseCase;
+
+	@Autowired
+	GetCyclistsByTeamCodeUseCase getCyclistsByTeamCodeUseCase;
+
+	@Autowired
+	GetCyclistByCompetitorNumber getCyclistByCompetitorNumber;
+
+	 @Autowired
+	GetAllCyclistsUseCase getAllCyclistsUseCase;
 	
 	@GetMapping("/api/cyclists")
-	public ResponseEntity<List<Cyclist>> findAllCyclists(
-			@RequestParam Map<String, String> reqParam) {
-		if (!reqParam.isEmpty()) return ResponseEntity.badRequest().build(); 
-		List<Cyclist> cyclists = new ArrayList<>();
-		cyclistRepository.findAll().forEach(cyclists::add);
-		return ResponseEntity.ok().body(cyclists);
+	public ResponseEntity<List<CyclistDto>> findAllCyclists(@RequestParam Map<String, String> reqParam) {
+		if (!reqParam.isEmpty()) return ResponseEntity.badRequest().build();
+		return ResponseEntity.ok().body(getAllCyclistsUseCase.apply());
 	}
 	
 	@PostMapping("/api/newCyclist")
-	public Cyclist saveNewCyclist(@Validated @RequestBody Cyclist newCyclist) {
-		return cyclistRepository.save(newCyclist);
+	public CyclistDto saveNewCyclist(@Validated @RequestBody CyclistDto newCyclist) {
+		return addCyclistUseCase.apply(newCyclist);
 	}
 	
 	@GetMapping("/api/cyclist/{competitorNumber}")
-	public ResponseEntity<Cyclist> findCyclistByCompetitorNumber(
-			@PathVariable(name = "competitorNumber") String competitorNumber) {
-		Optional<Cyclist> cyclist = cyclistRepository.findCyclistByCompetitorNumber(competitorNumber);
-		if (cyclist.isPresent()) return ResponseEntity.ok().body(cyclist.get());
-		else return ResponseEntity.notFound().build();
+	public ResponseEntity<CyclistDto> findCyclistByCompetitorNumber(@PathVariable(name = "competitorNumber") String competitorNumber) {
+		return ResponseEntity.ok().body(getCyclistByCompetitorNumber.apply(competitorNumber));
 	}
 	
 	@RequestMapping(value = "/api/cyclists", method = RequestMethod.GET, params = "teamCode")
-	public List<Cyclist> findCyclistsByTeamCode(
-			@RequestParam(name = "teamCode") String teamCode) {
-		List<Cyclist> cyclists = new ArrayList<>();
-		cyclistRepository.findByCyclingTeamTeamCode(teamCode).forEach(cyclists::add);
-		return cyclists;
+	public List<CyclistDto> findCyclistsByTeamCode(	@RequestParam(name = "teamCode") String teamCode) {
+		return getCyclistsByTeamCodeUseCase.apply(teamCode);
 	}
 
 }

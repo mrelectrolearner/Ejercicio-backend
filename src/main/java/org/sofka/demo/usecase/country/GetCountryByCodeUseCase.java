@@ -6,12 +6,10 @@ import org.sofka.demo.domain.Country;
 import org.sofka.demo.mappers.CountryMapper;
 import org.sofka.demo.model.CountryDto;
 import org.sofka.demo.repository.CountryRepository;
-import org.sofka.demo.utilities.util;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
