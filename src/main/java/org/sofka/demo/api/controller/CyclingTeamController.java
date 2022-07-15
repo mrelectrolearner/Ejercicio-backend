@@ -1,13 +1,8 @@
 package org.sofka.demo.api.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.sofka.demo.domain.CyclingTeam;
 import org.sofka.demo.model.CyclingTeamDto;
 import org.sofka.demo.repository.CyclingTeamRepository;
-import org.sofka.demo.usecase.cyclingTeam.CreateCyclingTeamUseCase;
+import org.sofka.demo.usecase.cyclingTeam.AddCyclingTeamUseCase;
 import org.sofka.demo.usecase.cyclingTeam.GetCyclingTeamByTeamCodeUseCase;
 import org.sofka.demo.usecase.cyclingTeam.GetCyclingTeamUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 public class CyclingTeamController {
@@ -31,21 +28,20 @@ public class CyclingTeamController {
 	 GetCyclingTeamUseCase getCyclingTeamUseCase;
 
 	@Autowired
-	 CreateCyclingTeamUseCase createCyclingTeamUseCase;
+	AddCyclingTeamUseCase addCyclingTeamUseCase;
 	@GetMapping("/api/teams")
-	public List<CyclingTeamDto> findAllCyclingTeams() {
+	public Flux<CyclingTeamDto> findAllCyclingTeams() {
 
 		return getCyclingTeamUseCase.apply();
 	}
 	
 	@PostMapping("/api/newTeam")
-	public CyclingTeamDto saveCyclingTeam(@Validated @RequestBody CyclingTeamDto newTeam) {
-		return createCyclingTeamUseCase.apply(newTeam);
+	public Mono<CyclingTeamDto> saveCyclingTeam(@Validated @RequestBody CyclingTeamDto newTeam) {
+		return addCyclingTeamUseCase.apply(newTeam);
 	}
 	
 	@GetMapping("/api/team/{team_code}")
-	public ResponseEntity<CyclingTeamDto> findCyclingTeamByCode(@PathVariable(name = "team_code") String teamCode) {
-		CyclingTeamDto team = getCyclingTeamByTeamCodeUseCase.apply(teamCode);
-		return ResponseEntity.ok().body(team);
+	public ResponseEntity<Mono<CyclingTeamDto>> findCyclingTeamByCode(@PathVariable(name = "team_code") String teamCode) {
+		return ResponseEntity.ok().body(getCyclingTeamByTeamCodeUseCase.apply(teamCode));
 	}
 }

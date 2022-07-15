@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 public class CyclistController {
@@ -42,23 +44,23 @@ public class CyclistController {
 	GetAllCyclistsUseCase getAllCyclistsUseCase;
 	
 	@GetMapping("/api/cyclists")
-	public ResponseEntity<List<CyclistDto>> findAllCyclists(@RequestParam Map<String, String> reqParam) {
+	public ResponseEntity<Flux<CyclistDto>> findAllCyclists(@RequestParam Map<String, String> reqParam) {
 		if (!reqParam.isEmpty()) return ResponseEntity.badRequest().build();
 		return ResponseEntity.ok().body(getAllCyclistsUseCase.apply());
 	}
 	
 	@PostMapping("/api/newCyclist")
-	public CyclistDto saveNewCyclist(@Validated @RequestBody CyclistDto newCyclist) {
+	public Mono<CyclistDto> saveNewCyclist(@Validated @RequestBody CyclistDto newCyclist) {
 		return addCyclistUseCase.apply(newCyclist);
 	}
 	
 	@GetMapping("/api/cyclist/{competitorNumber}")
-	public ResponseEntity<CyclistDto> findCyclistByCompetitorNumber(@PathVariable(name = "competitorNumber") String competitorNumber) {
+	public ResponseEntity<Mono<CyclistDto>> findCyclistByCompetitorNumber(@PathVariable(name = "competitorNumber") String competitorNumber) {
 		return ResponseEntity.ok().body(getCyclistByCompetitorNumber.apply(competitorNumber));
 	}
 	
 	@RequestMapping(value = "/api/cyclists", method = RequestMethod.GET, params = "teamCode")
-	public List<CyclistDto> findCyclistsByTeamCode(	@RequestParam(name = "teamCode") String teamCode) {
+	public Flux<CyclistDto> findCyclistsByTeamCode(	@RequestParam(name = "teamCode") String teamCode) {
 		return getCyclistsByTeamCodeUseCase.apply(teamCode);
 	}
 

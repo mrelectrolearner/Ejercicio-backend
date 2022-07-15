@@ -1,20 +1,28 @@
 package org.sofka.demo.utilities;
 
+import org.sofka.demo.mappers.Mapper;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Mono;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 public class Util {
-    public static <T> List<T> getListFromIterator(Iterator<T> iterator)
-    {
 
-        // Create an empty list
-        List<T> list = new ArrayList<>();
 
-        // Add each element of iterator to the List
-        iterator.forEachRemaining(list::add);
+    public static <D,E> Function<D,Mono<D>> save (ReactiveMongoRepository<E,String> repository,Mapper<E,D> mapper ){
 
-        // Return the List
-        return list;
+        return dto ->repository
+                .save(mapper
+                        .convertDtoToEntity()
+                        .apply(dto))
+                .map(country1 -> mapper
+                        .convertEntityToDto()
+                        .apply(country1));
+
     }
+
+
 }

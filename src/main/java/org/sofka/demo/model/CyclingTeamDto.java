@@ -14,9 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CyclingTeamDto {
-    private int id;
+    private String id;
     private String name;
     private String teamCode;
-    private Country country;
-    private List<Cyclist> cyclists;
+    private CountryDto country;
+    private List<CyclistDto> cyclists;
 }

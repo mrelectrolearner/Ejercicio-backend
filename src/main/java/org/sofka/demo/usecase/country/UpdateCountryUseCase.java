@@ -6,31 +6,27 @@ import org.sofka.demo.mappers.CountryMapper;
 import org.sofka.demo.model.CountryDto;
 import org.sofka.demo.repository.CountryRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateCountryUseCase {
-    private CountryRepository countryRepository;
-    private CountryMapper mapper;
-    private CreateCountryUseCase createCountryUseCase;
+    private final CountryRepository countryRepository;
+    private final CountryMapper mapper;
+    private final AddCountryUseCase addCountryUseCase;
 
-    public CountryDto apply(Integer id,CountryDto toUpdateCountryDto){
+    public Mono<CountryDto> apply(String id, CountryDto toUpdateCountryDto){
         log.info("\\n***** Updating country *****\\n\"");
-        CountryDto newCountryDto =countryRepository
+        Mono<CountryDto> newCountryDto =countryRepository
                 .findById(id)
-                .stream()
-                .map(country -> mapper.convertEntityToDto().apply(country))
-                .findFirst()
-                .orElse(new CountryDto());
+                .map(country -> mapper.convertEntityToDto().apply(country)).map(countryDto -> {
+                    countryDto.setId(id);
+                    countryDto.setCode(toUpdateCountryDto.getCode());
+                    countryDto.setName(toUpdateCountryDto.getName());
+                    return countryDto;
+                });
 
-        newCountryDto.setId(id);
-        newCountryDto.setCode(toUpdateCountryDto.getCode());
-        newCountryDto.setName(toUpdateCountryDto.getName());
-
-        return createCountryUseCase.apply(newCountryDto);
+        return newCountryDto.flatMap(addCountryUseCase::apply);
     }
 }

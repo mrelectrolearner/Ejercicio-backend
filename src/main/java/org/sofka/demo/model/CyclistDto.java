@@ -13,13 +13,12 @@ import org.sofka.demo.domain.CyclingTeam;
 @NoArgsConstructor
 public class CyclistDto {
 
-    private int id;
+    private String id;
 
     private String fullName;
 
     private String competitorNumber;
 
-    private Country country;
+    private CountryDto originCountry;
 
-    private CyclingTeam cyclingTeam;
 }

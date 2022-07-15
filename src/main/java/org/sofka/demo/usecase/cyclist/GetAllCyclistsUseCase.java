@@ -7,21 +7,21 @@ import org.sofka.demo.model.CyclistDto;
 import org.sofka.demo.repository.CyclistRepository;
 import org.sofka.demo.utilities.Util;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class GetAllCyclistsUseCase {
-    CyclistRepository cyclistRepository;
-    CyclistMapper cyclistMapper;
+    private final CyclistRepository cyclistRepository;
+    private final CyclistMapper cyclistMapper;
 
-    public List<CyclistDto> apply(){
-        List<Cyclist> cyclists = Util.getListFromIterator(cyclistRepository.findAll().iterator());
-        return cyclists
-                .stream()
-                .map(cyclist -> cyclistMapper.convertEntityToDto().apply(cyclist))
-                .collect(Collectors.toList());
-
+    public Flux<CyclistDto> apply(){
+        return cyclistRepository
+                .findAll()
+                .map(cyclist -> cyclistMapper
+                        .convertEntityToDto()
+                        .apply(cyclist));
     }
 }

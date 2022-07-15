@@ -6,16 +6,19 @@ import org.sofka.demo.mappers.CyclistMapper;
 import org.sofka.demo.model.CyclistDto;
 import org.sofka.demo.repository.CyclistRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
 public class GetCyclistByCompetitorNumber {
-    CyclistRepository cyclistRepository;
-    CyclistMapper cyclistMapper;
+    private final CyclistRepository cyclistRepository;
+    private final CyclistMapper cyclistMapper;
 
-    public CyclistDto apply(String competitorNumber ){
-        Cyclist cyclist = cyclistRepository.findCyclistByCompetitorNumber(competitorNumber).orElse(new Cyclist());
-        return cyclistMapper.convertEntityToDto().apply(cyclist);
-
+    public Mono<CyclistDto> apply(String competitorNumber ){
+        return cyclistRepository
+                .findCyclistByCompetitorNumber(competitorNumber)
+                .map(cyclist->cyclistMapper
+                        .convertEntityToDto()
+                        .apply(cyclist));
     }
 }

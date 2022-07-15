@@ -6,21 +6,21 @@ import org.sofka.demo.mappers.CyclistMapper;
 import org.sofka.demo.model.CyclistDto;
 import org.sofka.demo.repository.CyclistRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class GetCyclistsByTeamCodeUseCase {
-    CyclistRepository cyclistRepository;
-    CyclistMapper cyclistMapper;
+    private final CyclistRepository cyclistRepository;
+    private final CyclistMapper cyclistMapper;
 
-    public List<CyclistDto> apply(String teamCode){
-        List<Cyclist> cyclists = cyclistRepository.findByCyclingTeamTeamCode(teamCode);
-        return cyclists
-                .stream()
-                .map(cyclist -> cyclistMapper.convertEntityToDto().apply(cyclist))
-                .collect(Collectors.toList());
+    public Flux<CyclistDto> apply(String teamCode){
+        return cyclistRepository
+                .findByCyclingTeamTeamCode(teamCode)
+                .map(cyclist -> cyclistMapper.convertEntityToDto().apply(cyclist));
 
     }
 }

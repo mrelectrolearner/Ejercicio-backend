@@ -8,6 +8,7 @@ import org.sofka.demo.model.CountryDto;
 import org.sofka.demo.repository.CountryRepository;
 import org.sofka.demo.utilities.Util;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,10 +21,13 @@ public class GetCountryUseCase {
     private final CountryRepository countryRepository;
     private final CountryMapper mapper;
 
-    public List<CountryDto> apply (){
-        List<Country> countries= Util.getListFromIterator(countryRepository.findAll().iterator());
+    public Flux<CountryDto> apply (){
         log.info("\n***** Getting All countries *****\n");
-        return countries.stream().map(country ->mapper.convertEntityToDto().apply(country) ).collect(Collectors.toList());
+        return countryRepository
+                .findAll()
+                .map(country ->mapper
+                        .convertEntityToDto()
+                        .apply(country) );
     }
 
 
