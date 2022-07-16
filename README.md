@@ -6,7 +6,7 @@ que participan en el tour de francia, los equipos de ciclismo y sus paises de or
 Se desarrollo inicialmente una version en forma no reactiva usando como base de datos mysql local y se guardo en la rama "non-reactive".
 
 ## Version reactiva
-Posteriormente se modifico para que fuera reactivo el proyecto utilizando una base de datos mongoDB local.
+Posteriormente se modifico para que fuera reactivo el proyecto utilizando una base de datos mongoDB local. Se guardo en la rama "reactive"
 Quedo pendiente utilizar routes en lugar de endpoints  tipo rest controller.
 
 ## Swagger
